@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalculMoyenne - Étudiants en Médecine Dentaire</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c6bac;
+            --secondary: #38b6ac;
+            --accent: #ff6b6b;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4eaf1 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,128L48,117.3C96,107,192,85,288,112C384,139,480,213,576,218.7C672,224,768,160,864,138.7C960,117,1056,139,1152,149.3C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(44, 107, 172, 0.1);
+            border-radius: 50%;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 107, 172, 0.2);
+        }
+
+        .coefficient {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #ddd;
+        }
+
+        .coefficient label {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .coefficient input {
+            width: 60px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .module-average {
+            font-weight: bold;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+        }
+
+        .module-average.low {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        .module-average.high {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+
+        .results-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .general-average {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .general-average.low {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+
+        .general-average.high {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+
+        .btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(44, 107, 172, 0.3);
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(44, 107, 172, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .subject-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .animated {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>DentCalc Moyenne</h1>
+        <p class="subtitle">Université de Tlemcen - Faculté de Médecine Dentaire -</p>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Anatomie -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Anatomie</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="anatomie_emd1">EMD 1</label>
+                    <input type="number" id="anatomie_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anatomie_emd2">EMD 2</label>
+                    <input type="number" id="anatomie_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anatomie_emd3">EMD 3</label>
+                    <input type="number" id="anatomie_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anatomie_tp1">TP 1</label>
+                    <input type="number" id="anatomie_tp1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anatomie_tp2">TP 2</label>
+                    <input type="number" id="anatomie_tp2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anatomie_tp3">TP 3</label>
+                    <input type="number" id="anatomie_tp3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="anatomie_coeff">Coefficient:</label>
+                    <input type="number" id="anatomie_coeff" min="0" step="0.5" value="4" class="coeff-input">
+                </div>
+                <div class="module-average" id="anatomie_average">Moyenne: -</div>
+                <p class="subject-info">Formule: ((EMD1+EMD2+EMD3)*2 + (TP1+TP2+TP3)) / 9</p>
+            </div>
+
+            <!-- Biophysique -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Biophysique</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-atom"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="biophysique_emd1">EMD 1</label>
+                    <input type="number" id="biophysique_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biophysique_emd2">EMD 2</label>
+                    <input type="number" id="biophysique_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biophysique_emd3">EMD 3</label>
+                    <input type="number" id="biophysique_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biophysique_tp1">TP 1</label>
+                    <input type="number" id="biophysique_tp1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biophysique_tp2">TP 2</label>
+                    <input type="number" id="biophysique_tp2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biophysique_tp3">TP 3</label>
+                    <input type="number" id="biophysique_tp3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="biophysique_coeff">Coefficient:</label>
+                    <input type="number" id="biophysique_coeff" min="0" step="0.5" value="3" class="coeff-input">
+                </div>
+                <div class="module-average" id="biophysique_average">Moyenne: -</div>
+                <p class="subject-info">Formule: ((EMD1+EMD2+EMD3)*2 + (TP1+TP2+TP3)) / 9</p>
+            </div>
+
+            <!-- Chimie -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Chimie</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="chimie_emd1">EMD 1</label>
+                    <input type="number" id="chimie_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="chimie_emd2">EMD 2</label>
+                    <input type="number" id="chimie_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="chimie_emd3">EMD 3</label>
+                    <input type="number" id="chimie_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="chimie_tp1">TP 1</label>
+                    <input type="number" id="chimie_tp1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="chimie_tp2">TP 2</label>
+                    <input type="number" id="chimie_tp2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="chimie_tp3">TP 3</label>
+                    <input type="number" id="chimie_tp3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="chimie_coeff">Coefficient:</label>
+                    <input type="number" id="chimie_coeff" min="0" step="0.5" value="3" class="coeff-input">
+                </div>
+                <div class="module-average" id="chimie_average">Moyenne: -</div>
+                <p class="subject-info">Formule: ((EMD1+EMD2+EMD3)*2 + (TP1+TP2+TP3)) / 9</p>
+            </div>
+
+            <!-- Biomath -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Biomath</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-square-root-alt"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="biomath_emd1">EMD 1</label>
+                    <input type="number" id="biomath_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biomath_emd2">EMD 2</label>
+                    <input type="number" id="biomath_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biomath_emd3">EMD 3</label>
+                    <input type="number" id="biomath_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biomath_td">TD</label>
+                    <input type="number" id="biomath_td" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="biomath_coeff">Coefficient:</label>
+                    <input type="number" id="biomath_coeff" min="0" step="0.5" value="3" class="coeff-input">
+                </div>
+                <div class="module-average" id="biomath_average">Moyenne: -</div>
+                <p class="subject-info">Formule: (((EMD1+EMD2+EMD3)/3) + TD) / 2</p>
+            </div>
+
+            <!-- Biochimie -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Biochimie</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="biochimie_emd1">EMD 1</label>
+                    <input type="number" id="biochimie_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biochimie_emd2">EMD 2</label>
+                    <input type="number" id="biochimie_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biochimie_emd3">EMD 3</label>
+                    <input type="number" id="biochimie_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="biochimie_td">TD</label>
+                    <input type="number" id="biochimie_td" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="biochimie_coeff">Coefficient:</label>
+                    <input type="number" id="biochimie_coeff" min="0" step="0.5" value="3" class="coeff-input">
+                </div>
+                <div class="module-average" id="biochimie_average">Moyenne: -</div>
+                <p class="subject-info">Formule: (((EMD1+EMD2+EMD3)/3) + TD) / 2</p>
+            </div>
+
+            <!-- Physiologie -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Physiologie</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="physiologie_emd1">EMD 1</label>
+                    <input type="number" id="physiologie_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="physiologie_emd2">EMD 2</label>
+                    <input type="number" id="physiologie_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="physiologie_td">TD</label>
+                    <input type="number" id="physiologie_td" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="physiologie_coeff">Coefficient:</label>
+                    <input type="number" id="physiologie_coeff" min="0" step="0.5" value="2" class="coeff-input">
+                </div>
+                <div class="module-average" id="physiologie_average">Moyenne: -</div>
+                <p class="subject-info">Formule: (((EMD1+EMD2)/2) + TD) / 2</p>
+            </div>
+
+            <!-- Physique -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Physique</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="physique_emd1">EMD 1</label>
+                    <input type="number" id="physique_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="physique_emd2">EMD 2</label>
+                    <input type="number" id="physique_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="physique_td">TD</label>
+                    <input type="number" id="physique_td" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="physique_coeff">Coefficient:</label>
+                    <input type="number" id="physique_coeff" min="0" step="0.5" value="2" class="coeff-input">
+                </div>
+                <div class="module-average" id="physique_average">Moyenne: -</div>
+                <p class="subject-info">Formule: (((EMD1+EMD2)/2) + TD) / 2</p>
+            </div>
+
+            <!-- Cyto-Hysto-Embryo -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Cyto-Hysto-Embryo</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="cyto_emd1">EMD 1</label>
+                    <input type="number" id="cyto_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="cyto_emd2">EMD 2</label>
+                    <input type="number" id="cyto_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="cyto_emd3">EMD 3</label>
+                    <input type="number" id="cyto_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="cyto_td1">TD 1</label>
+                    <input type="number" id="cyto_td1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="cyto_td2">TD 2</label>
+                    <input type="number" id="cyto_td2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="cyto_td3">TD 3</label>
+                    <input type="number" id="cyto_td3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="cyto_coeff">Coefficient:</label>
+                    <input type="number" id="cyto_coeff" min="0" step="0.5" value="4" class="coeff-input">
+                </div>
+                <div class="module-average" id="cyto_average">Moyenne: -</div>
+                <p class="subject-info">Formule: (EMD1+EMD2+EMD3 + TD1+TD2+TD3) / 6</p>
+            </div>
+
+            <!-- Français -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Français</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="francais_emd1">EMD 1</label>
+                    <input type="number" id="francais_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="francais_emd2">EMD 2</label>
+                    <input type="number" id="francais_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="francais_emd3">EMD 3</label>
+                    <input type="number" id="francais_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="francais_td">TD</label>
+                    <input type="number" id="francais_td" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="francais_coeff">Coefficient:</label>
+                    <input type="number" id="francais_coeff" min="0" step="0.5" value="1" class="coeff-input">
+                </div>
+                <div class="module-average" id="francais_average">Moyenne: -</div>
+                <p class="subject-info">Formule: ((EMD1+EMD2+EMD3)/3)*0.6 + TD*0.4</p>
+            </div>
+
+            <!-- Anglais -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Anglais</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="anglais_emd1">EMD 1</label>
+                    <input type="number" id="anglais_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anglais_emd2">EMD 2</label>
+                    <input type="number" id="anglais_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anglais_emd3">EMD 3</label>
+                    <input type="number" id="anglais_emd3" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="anglais_td">TD</label>
+                    <input type="number" id="anglais_td" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="anglais_coeff">Coefficient:</label>
+                    <input type="number" id="anglais_coeff" min="0" step="0.5" value="1" class="coeff-input">
+                </div>
+                <div class="module-average" id="anglais_average">Moyenne: -</div>
+                <p class="subject-info">Formule: ((EMD1+EMD2+EMD3)/3)*0.6 + TD*0.4</p>
+            </div>
+
+            <!-- SSH -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">SSH</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="ssh_emd1">EMD 1</label>
+                    <input type="number" id="ssh_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="ssh_td1">TD 1</label>
+                    <input type="number" id="ssh_td1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="ssh_coeff">Coefficient:</label>
+                    <input type="number" id="ssh_coeff" min="0" step="0.5" value="1" class="coeff-input">
+                </div>
+                <div class="module-average" id="ssh_average">Moyenne: -</div>
+                <p class="subject-info">Formule: EMD1*0.6 + TD1*0.4</p>
+            </div>
+
+            <!-- Génétique -->
+            <div class="card animated">
+                <div class="card-header">
+                    <h2 class="card-title">Génétique</h2>
+                    <div class="card-icon">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="genetique_emd1">EMD 1</label>
+                    <input type="number" id="genetique_emd1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="genetique_emd2">EMD 2</label>
+                    <input type="number" id="genetique_emd2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="genetique_td1">TD 1</label>
+                    <input type="number" id="genetique_td1" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="input-group">
+                    <label for="genetique_td2">TD 2</label>
+                    <input type="number" id="genetique_td2" min="0" max="20" step="0.01" class="note-input">
+                </div>
+                <div class="coefficient">
+                    <label for="genetique_coeff">Coefficient:</label>
+                    <input type="number" id="genetique_coeff" min="0" step="0.5" value="2" class="coeff-input">
+                </div>
+                <div class="module-average" id="genetique_average">Moyenne: -</div>
+                <p class="subject-info">Formule: (EMD1+EMD2+TD1+TD2) / 4</p>
+            </div>
+
+        </div>
+
+        <div class="results-card animated">
+            <h2 class="results-title">Résultats Généraux</h2>
+            <div class="general-average" id="general_average">-</div>
+            <button class="btn" id="calculate_btn">Calculer la Moyenne Générale</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 CalculMoyenne Dentaire - Tous droits réservés</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration des formules pour chaque matière
+            const subjectFormulas = {
+                'anatomie': (values) => {
+                    const emdSum = (values.emd1 + values.emd2 + values.emd3) * 2;
+                    const tpSum = values.tp1 + values.tp2 + values.tp3;
+                    return (emdSum + tpSum) / 9;
+                },
+                'biophysique': (values) => {
+                    const emdSum = (values.emd1 + values.emd2 + values.emd3) * 2;
+                    const tpSum = values.tp1 + values.tp2 + values.tp3;
+                    return (emdSum + tpSum) / 9;
+                },
+                'chimie': (values) => {
+                    const emdSum = (values.emd1 + values.emd2 + values.emd3) * 2;
+                    const tpSum = values.tp1 + values.tp2 + values.tp3;
+                    return (emdSum + tpSum) / 9;
+                },
+                'biomath': (values) => {
+                    const emdAvg = (values.emd1 + values.emd2 + values.emd3) / 3;
+                    return (emdAvg + values.td) / 2;
+                },
+                'biochimie': (values) => {
+                    const emdAvg = (values.emd1 + values.emd2 + values.emd3) / 3;
+                    return (emdAvg + values.td) / 2;
+                },
+                'physiologie': (values) => {
+                    const emdAvg = (values.emd1 + values.emd2) / 2;
+                    return (emdAvg + values.td) / 2;
+                },
+                'physique': (values) => {
+                    const emdAvg = (values.emd1 + values.emd2) / 2;
+                    return (emdAvg + values.td) / 2;
+                },
+                'cyto': (values) => {
+                    return (values.emd1 + values.emd2 + values.emd3 + values.td1 + values.td2 + values.td3) / 6;
+                },
+                'francais': (values) => {
+                    const emdAvg = (values.emd1 + values.emd2 + values.emd3) / 3;
+                    return (emdAvg * 0.6) + (values.td * 0.4);
+                },
+                'anglais': (values) => {
+                    const emdAvg = (values.emd1 + values.emd2 + values.emd3) / 3;
+                    return (emdAvg * 0.6) + (values.td * 0.4);
+                },
+                'ssh': (values) => {
+                    return (values.emd1 * 0.6) + (values.td1 * 0.4);
+                },
+                'genetique': (values) => {
+                    return (values.emd1 + values.emd2 + values.td1 + values.td2) / 4;
+                }
+            };
+
+            // Écouteurs d'événements pour le calcul automatique
+            document.querySelectorAll('.note-input, .coeff-input').forEach(input => {
+                input.addEventListener('input', calculateModuleAverage);
+            });
+
+            // Calcul de la moyenne pour un module
+            function calculateModuleAverage() {
+                const card = this.closest('.card');
+                if (!card) return;
+                
+                const subjectId = card.querySelector('[class*="card-title"]').textContent.toLowerCase().replace('cyto-hysto-embryo', 'cyto').replace('é', 'e');
+                const formula = subjectFormulas[subjectId];
+                
+                if (!formula) return;
+                
+                // Récupérer les valeurs des inputs
+                const inputs = card.querySelectorAll('.note-input');
+                const values = {};
+                
+                inputs.forEach(input => {
+                    const key = input.id.replace(`${subjectId}_`, '');
+                    values[key] = parseFloat(input.value) || 0;
+                });
+                
+                // Calculer la moyenne
+                const average = formula(values);
+                const averageElement = card.querySelector('.module-average');
+                
+                // Afficher la moyenne
+                if (!isNaN(average)) {
+                    averageElement.textContent = `Moyenne: ${average.toFixed(2)}`;
+                    
+                    // Changer la couleur selon la moyenne
+                    if (average < 10) {
+                        averageElement.className = 'module-average low';
+                    } else {
+                        averageElement.className = 'module-average high';
+                    }
+                } else {
+                    averageElement.textContent = 'Moyenne: -';
+                    averageElement.className = 'module-average';
+                }
+            }
+
+            // Calcul de la moyenne générale
+            document.getElementById('calculate_btn').addEventListener('click', function() {
+                let total = 0;
+                let totalCoeff = 0;
+                
+                document.querySelectorAll('.card').forEach(card => {
+                    const averageText = card.querySelector('.module-average').textContent;
+                    const averageMatch = averageText.match(/[\d.]+/);
+                    
+                    if (averageMatch) {
+                        const average = parseFloat(averageMatch[0]);
+                        const coeffInput = card.querySelector('.coeff-input');
+                        const coeff = parseFloat(coeffInput.value) || 0;
+                        
+                        if (coeff > 0) {
+                            total += average * coeff;
+                            totalCoeff += coeff;
+                        }
+                    }
+                });
+                
+                const generalAverage = totalCoeff > 0 ? total / totalCoeff : 0;
+                const generalAverageElement = document.getElementById('general_average');
+                
+                generalAverageElement.textContent = generalAverage.toFixed(2);
+                
+                if (generalAverage < 10) {
+                    generalAverageElement.className = 'general-average low pulse';
+                } else {
+                    generalAverageElement.className = 'general-average high pulse';
+                }
+            });
+
+            // Animation d'entrée des cartes
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
